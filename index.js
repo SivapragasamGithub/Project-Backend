@@ -30,7 +30,7 @@ const SECRET_KEY =
 //Middleware
 app.use(
   cors({
-    origin: "https://incredible-boba-b3094a.netlify.app/",
+    origin: "https://incredible-boba-b3094a.netlify.app",
   })
 );
 app.use(express.json());
