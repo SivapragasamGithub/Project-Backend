@@ -443,7 +443,7 @@ app.get("/employers", async (req, res) => {
     //3.select the collection
 
     const collection = db.collection("employer");
-    console.log("The log is:", collection);
+    // console.log("The log is:", collection);
 
     //do the operation
     const employers = await collection.find({}).toArray();
@@ -615,11 +615,12 @@ app.post("/reviews", async (req, res) => {
     const db = connection.db("marketplace");
     const collection = db.collection("reviews");
 
-    const { freelancerId, clientId, rating, comment } = req.body;
+    const { freelancerId, clientId, rating, comment, clientemail } = req.body;
 
     const review = {
       freelancerId: new ObjectId(freelancerId),
       clientId: new ObjectId(clientId),
+      clientemail,
       rating,
       comment,
       response: null, // No response yet
