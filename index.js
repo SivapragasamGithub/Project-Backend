@@ -615,12 +615,11 @@ app.post("/reviews", async (req, res) => {
     const db = connection.db("marketplace");
     const collection = db.collection("reviews");
 
-    const { freelancerId, clientId, rating, comment, clientemail } = req.body;
+    const { freelancerId, clientId, rating, comment } = req.body;
 
     const review = {
       freelancerId: new ObjectId(freelancerId),
       clientId: new ObjectId(clientId),
-      clientemail,
       rating,
       comment,
       response: null, // No response yet
