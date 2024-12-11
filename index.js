@@ -443,6 +443,8 @@ app.get("/employers", async (req, res) => {
     //3.select the collection
 
     const collection = db.collection("employer");
+    console.log("The log is:", collection);
+
     //do the operation
     const employers = await collection.find({}).toArray();
     // console.log(users);
