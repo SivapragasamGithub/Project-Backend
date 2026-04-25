@@ -31,7 +31,7 @@ const SECRET_KEY =
 app.use(
   cors({
     origin: "https://incredible-boba-b3094a.netlify.app",
-  })
+  }),
 );
 app.use(express.json());
 
@@ -51,21 +51,12 @@ app.post("/user", async (req, res) => {
     const db = connection.db("marketplace");
     //3.select the collection
     const collection = db.collection("candidates");
-    console.log("the requ.body while receiving for model saving:", req.body);
     //do the operation
     const result = await collection.insertOne(req.body);
     const createdUser = await collection.findOne({ _id: result.insertedId });
-    console.log("the created user while model saving:", createdUser);
-    console.log("the result while model saving:", result);
-    console.log("the result ID is while model saving:", result.insertedId);
-
     //close the collection
     connection.close();
     res.json({ createdUser, _id: result.insertedId });
-    // res.json({
-    //   message: "Profile created succesfully",
-    //   id: result.insertedId,
-    // });
   } catch (error) {
     console.log(error);
 
@@ -85,8 +76,6 @@ app.put("/user/:id", async (req, res) => {
     // Select the database and collection
     const db = connection.db("marketplace");
     const collection = db.collection("candidates");
-    console.log("the req.params.id is:", req.params.id);
-
     // Validate ObjectId
     if (!ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ message: "Invalid User ID format on put" });
@@ -97,14 +86,10 @@ app.put("/user/:id", async (req, res) => {
     const updateData = req.body;
     // Remove any properties that not be updated
     delete updateData._id;
-    console.log("the update data is:", updateData);
-    console.log("the update id is:", userId);
     const result = await collection.findOneAndUpdate(
       { _id: userId },
-      { $set: updateData }
+      { $set: updateData },
     );
-    console.log("the result is:", result);
-
     // Check if a document was modified
     if (result.modifiedCount === 0) {
       return res
@@ -113,7 +98,6 @@ app.put("/user/:id", async (req, res) => {
     }
     // Fetch the updated user to return
     const updatedUser = await collection.findOne({ _id: userId });
-    console.log("the updateddddd data is:", updatedUser);
 
     res.json({
       message: "User profile updated successfully",
@@ -135,7 +119,7 @@ app.get("/user/:id", async (req, res) => {
   let connection;
   try {
     // Connect to MongoDB
-    connection = new MongoClient(URL);
+    connection = await new MongoClient(URL);
     await connection.connect();
     const db = connection.db("marketplace");
     const collection = db.collection("candidates");
@@ -144,12 +128,11 @@ app.get("/user/:id", async (req, res) => {
     if (!ObjectId.isValid(req.params.id)) {
       console.log(
         "Invalid ObjectId format while get in user:id:",
-        req.params.id
+        req.params.id,
       );
       return res.status(400).json({ message: "Invalid User ID format on get" });
     }
 
-    console.log("Fetching user with ID:", req.params.id);
     const userId = new ObjectId(req.params.id);
     const updateData = req.body;
     // Convert the string ID to ObjectId for querying
@@ -179,7 +162,7 @@ app.get("/user/:id", async (req, res) => {
 
 app.get("/users", async (req, res) => {
   try {
-    const connection = new MongoClient(URL);
+    const connection = await new MongoClient(URL);
     await connection.connect();
     const db = connection.db("marketplace");
     const collection = db.collection("candidates");
@@ -252,7 +235,7 @@ app.post("/login", async (req, res) => {
     if (employer) {
       const passwordCorrect = await bcrypt.compare(
         req.body.password,
-        employer.password
+        employer.password,
       );
       if (!passwordCorrect) {
         return res
@@ -270,7 +253,7 @@ app.post("/login", async (req, res) => {
 
       const token = jwt.sign(
         { id: employerDetails._id.toString() },
-        SECRET_KEY
+        SECRET_KEY,
       );
       return res.json({
         message: "Employer login successful",
@@ -292,7 +275,7 @@ app.post("/login", async (req, res) => {
 
     const passwordCorrect = await bcrypt.compare(
       req.body.password,
-      user.password
+      user.password,
     );
     if (!passwordCorrect) {
       return res
@@ -434,7 +417,7 @@ app.post("/employer", async (req, res) => {
 app.get("/employers", async (req, res) => {
   try {
     //1.connect the DB server
-    const connection = new MongoClient(URL);
+    const connection = await new MongoClient(URL);
     await connection.connect();
     //2.select the DB
 
@@ -464,7 +447,7 @@ app.get("/employer/:id", async (req, res) => {
   let connection;
   try {
     // Connect to MongoDB
-    connection = new MongoClient(URL);
+    connection = await new MongoClient(URL);
     await connection.connect();
     const db = connection.db("marketplace");
     const collection = db.collection("employer");
@@ -472,7 +455,7 @@ app.get("/employer/:id", async (req, res) => {
     if (!ObjectId.isValid(req.params.id)) {
       console.log(
         "Invalid ObjectId format while get in employer:id:",
-        req.params.id
+        req.params.id,
       );
       return res
         .status(400)
@@ -535,7 +518,7 @@ app.put("/employer/:id", async (req, res) => {
 
     const result = await collection.findOneAndUpdate(
       { _id: employerId },
-      { $set: updateData }
+      { $set: updateData },
     );
     console.log("the result is:", result);
 
@@ -654,7 +637,7 @@ app.put("/reviews/:reviewId", async (req, res) => {
     const updatedReview = await collection.findOneAndUpdate(
       { _id: new ObjectId(reviewId) },
       { $set: { response } },
-      { returnDocument: "after" }
+      { returnDocument: "after" },
     );
 
     connection.close();
@@ -671,7 +654,7 @@ app.put("/reviews/:reviewId", async (req, res) => {
 
 app.get("/freelancers/:freelancerId/reviews", async (req, res) => {
   try {
-    const connection = new MongoClient(URL);
+    const connection = await new MongoClient(URL);
     await connection.connect();
 
     const db = connection.db("marketplace");
